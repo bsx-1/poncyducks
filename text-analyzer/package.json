@@ -1,0 +1,19 @@
+{
+  "name": "poncy-duck-text-analyzer",
+  "version": "1.0.0",
+  "description": "Analyze text for sentiment and content",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bsx-1/poncyducks.git"
+  },
+  "author": "Nick Duggar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bsx-1/poncyducks/issues"
+  },
+  "homepage": "https://github.com/bsx-1/poncyducks#readme"
+}
