@@ -2,6 +2,10 @@
 
 This is a template for using Express and React in the same project. It is based on Create React App. The following readme was totally stolen from the sample :)
 
+## Notes
+
+Please run this on VSCode. Go to the file folder, right click, and select "Open with Code." OR cd into the directory and type "code ."
+
 ## Installing
 
 ```bash
