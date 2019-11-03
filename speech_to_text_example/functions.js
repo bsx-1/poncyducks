@@ -102,6 +102,7 @@ function stopSpeechToText(){
     console.log(wordCounts);
     //displays word most frequent
     console.log(sortedWordCount(wordCounts)[0][0]);
+    postToSentiment(myJsonRequest);
     startRecognizeOnceAsyncButton.disabled = false;
     phraseDiv.innerHTML += "stopped";
     recognizer.close();
