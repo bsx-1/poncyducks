@@ -15,6 +15,10 @@ document.addEventListener("DOMContentLoaded", function () {
   serviceRegion = document.getElementById("serviceRegion");
   phraseDiv = document.getElementById("phraseDiv");
 
+  //will hold JSON with all sentences by the time stop button pressed
+  var myJsonRequest = createInitialJson();
+
+  //will hold a string with all speech recognized by the time stop button is pressed
   var myFinalText = "";
 
 
@@ -23,8 +27,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       phraseDiv.innerHTML += "no recognizer";
     } else {
-      console.log(myFinalText);
-      sentenceToHash(myFinalText);
+      var wordCounts = sentenceToHash(myFinalText);
+      console.log(wordCounts);
+      //displays word most frequent
+      console.log(sortedWordCount(wordCounts)[0][0]);
       startRecognizeOnceAsyncButton.disabled = false;
       phraseDiv.innerHTML += "stopped";
       recognizer.close();
@@ -74,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
     recognizer.recognized = function(s, e){
         phraseDiv.innerHTML += e.result.text;
         myFinalText += e.result.text;
+        myJsonRequest = addSentenceToJson(e.result.text,myJsonRequest);
         console.log('recognized text', e.result.text);
     };
   });
@@ -96,12 +103,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function test(){
   var testTxt = document.getElementById("testpara");
-  var mytest = "Hi, my name, is chungus. I want to eat Rungus. I like to hi my name i I iI I I";
-  var splitWords = sentenceToHash(mytest);
-  testTxt.innerHTML = mytest;
-
+  var testingJson = createInitialJson();
+  testingJson = addSentenceToJson("I am having a great time.",testingJson);
+  testingJson = addSentenceToJson("I am having a horrible time.", testingJson);
+  postToSentiment(testingJson);
 }
 
+//sends JSON to sentiment analyzer. JSON can be created with createInitialJson and addSentenceToJson
+function postToSentiment(myJson){
+  var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+  var theUrl = "https://cors-anywhere.herokuapp.com/"+"https://poncyduckstextanalyzer.azurewebsites.net/api/HttpTrigger?code=ITA5bKwNaUKggjsmeaoCNzxsCr11tahKUmx9afV/XDNsCj/tIERNWQ==";
+  xmlhttp.open("POST", theUrl);
+  xmlhttp.setRequestHeader("Content-Type", "application/json");
+  xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            myResponse = JSON.parse(this.responseText);
+            console.log(myResponse)
+        }
+  };
+  xmlhttp.send(JSON.stringify(myJson));
+  //xmlhttp.send(JSON.stringify({"data":{"documents":[{"language":"en", "id":"1", "text":"I had the best day of my life."}]}}));
+}
+
+//sorts unsorted object based on word count
+function sortedWordCount(unsortedObject){
+  var sortable = [];
+  for (var word in unsortedObject){
+    sortable.push([word,unsortedObject[word]]);
+  }
+  sortable.sort(function(a,b){
+    return b[1]-a[1];
+  })
+  return sortable;
+}
+
+//returns a JSON with empty documents data
+//call this and pass returned JSON into addSentenceToJson
+function createInitialJson(){
+  var myText = '{"data":{"documents":[]}}';
+  return JSON.parse(myText);
+}
+
+//returns a JSON with a sentence added to documents data in the given JSON
+//given JSON should be initially created by createInitialJson
+function addSentenceToJson(singleSentence, givenJson){
+  var myId = givenJson.data.documents.length + 1;
+  myId = myId.toString(10);
+  givenJson.data.documents.push({"language":"en","id":myId,"text":singleSentence})
+  return givenJson;
+}
+
+//an object with words mapped to count of word number when long text passed in.
 function sentenceToHash(mySentence){
   return wordArrayToHash(sentenceToWordArray(mySentence));
 }
@@ -112,7 +164,7 @@ function sentenceToWordArray(mySentence){
   return myWordArray;
 }
 
-//returns an object with words mapped to count of word number
+//returns an object with words mapped to count of word number when array of words passed in.
 function wordArrayToHash(myWordArray){
   let object = {};
   for(var i=0;i<myWordArray.length;i++){
@@ -124,8 +176,8 @@ function wordArrayToHash(myWordArray){
       object[lowerCaseWord] += 1;
     }
   }
-  for(const stuff in object){
+  /*for(const stuff in object){
     console.log(stuff + object[stuff]);
-  }
+  }*/
   return object;
 }
