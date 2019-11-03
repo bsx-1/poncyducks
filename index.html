@@ -46,6 +46,7 @@ body {
           <div class="card-body">
             <h5 class="card-title">Answer the interview question. Your words will show below.</h5>
             <p class="card-text" id='phraseDiv'>Your words will go here!</p>
+            <p class="card-text" id='stopper'></p>            
             <a href="#" onclick="startSpeechToText()" id="startRecognizeOnceAsyncButton" class="btn btn-success btn-sm active" role="button" aria-pressed="true">Start</a>
             <a href="#" onclick="stopSpeechToText()" id="stopRecognition" class="btn btn-danger btn-sm" role="button">Stop</a>
           </div>
@@ -56,7 +57,10 @@ body {
         <div class="card" style="width: 44rem;">
             <div class="card-body">
               <h5 class="card-title">Word Choice Analysis. Frequently used words and fillers shown below.</h5>
+              <h6 id="choiceTitle"></h6>
               <p class="card-text" id='wordsused'></p>
+              <h6 id="fillTitle"></h6>
+              <p class="card-text" id='fillused'></p>
             </div>
           </div>
       </tr>    
@@ -71,6 +75,8 @@ body {
           </div>
       </tr>    
   </table>
+  <br>
+
 </div>
 
  <!-- SDK reference goes here -->
@@ -80,6 +86,22 @@ body {
 
  <!-- Sample code goes here -->
 <!-- Speech SDK USAGE -->
+<div class="jumbotron">
+    <h1 class="display-4">About</h1>
+    <p class="lead">This website is designed to help students or young professionals looking to sharpen their interview skills. Sometimes it isn't easy to 
+      find someone to help you out! And so, you can use a robot :) Special thanks to the Freetail Hackers and HackTX for making this project possible.
+    </p>
+    <hr class="my-4">
+    <h5>Tools</h5>
+    <p>Frontend: HTML5, CSS3, JavaScrip, Bootstrap</p>
+    <p>Backend: JavaScript, Microsoft Azure Sentiment Analysis and Speech SDK</p>
+    <p>Testing: Postman</p>
+    <p>Hosting: Microsoft Azure</p>
+    <h5>Team</h5>
+    <p>Takuma Fujiwara, Nick Duggar, Jacob Stokes, Arthur Wojtyna, Tyler Takeyama</p>
+  </div>
+  
+<img src="micro.png" img-fluid" width="170" height="60" alt="Responsive image">
 
 </body>
 </html>
