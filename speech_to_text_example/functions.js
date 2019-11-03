@@ -8,38 +8,44 @@ var authorizationToken;
 var SpeechSDK;
 var recognizer;
 var fillerWords = ["umm", "ummm", "um", "ah", "ahh", "ahhh", "uh", "uhh", "uhhh","so","like", "yeah",  "ok", "well", "right","see","hm","basically"];
+var myJsonRequest;
+var myFinalText;
 
 document.addEventListener("DOMContentLoaded", function () {
-  startRecognizeOnceAsyncButton = document.getElementById("startRecognizeOnceAsyncButton");
-  stopButton = document.getElementById("stopRecognition");
-  subscriptionKey = document.getElementById("subscriptionKey");
-  serviceRegion = document.getElementById("serviceRegion");
-  phraseDiv = document.getElementById("phraseDiv");
+  init();
+});
 
+function test(){
+  var testTxt = document.getElementById("testpara");
+  console.log(findFillerWord(sentenceToHash("Hello, so like like so so so so I am")));
+}
+
+function init(){
+  phraseDiv = document.getElementById("phraseDiv");
+  startRecognizeOnceAsyncButton = document.getElementById("startRecognizeOnceAsyncButton");
+  subscriptionKey = "f05deb49d4f943ec8fbe53adcf5bdfd9";
+  serviceRegion = "westus";
+  phraseDiv.innerHTML = "";
   //will hold JSON with all sentences by the time stop button pressed
-  var myJsonRequest = createInitialJson();
+  myJsonRequest = createInitialJson();
 
   //will hold a string with all speech recognized by the time stop button is pressed
-  var myFinalText = "";
+  myFinalText = "";
+  if (!!window.SpeechSDK) {
+    SpeechSDK = window.SpeechSDK;
+    startRecognizeOnceAsyncButton.disabled = false;
 
+    document.getElementById('content').style.display = 'block';
+    document.getElementById('warning').style.display = 'none';
+  }
+}
 
-  stopButton.addEventListener("click", function(){
-    if(recognizer==undefined){
+function startSpeechToText(){
+    phraseDiv = document.getElementById("phraseDiv");
+    startRecognizeOnceAsyncButton = document.getElementById("startRecognizeOnceAsyncButton");
+    subscriptionKey = "f05deb49d4f943ec8fbe53adcf5bdfd9";
+    serviceRegion = "westus";
 
-      phraseDiv.innerHTML += "no recognizer";
-    } else {
-      var wordCounts = sentenceToHash(myFinalText);
-      console.log(wordCounts);
-      //displays word most frequent
-      console.log(sortedWordCount(wordCounts)[0][0]);
-      startRecognizeOnceAsyncButton.disabled = false;
-      phraseDiv.innerHTML += "stopped";
-      recognizer.close();
-      recognizer = undefined;
-    }
-  });
-
-  startRecognizeOnceAsyncButton.addEventListener("click", function () {
     startRecognizeOnceAsyncButton.disabled = true;
     phraseDiv.innerHTML = "";
 
@@ -52,12 +58,13 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("Please enter your Microsoft Cognitive Services Speech subscription key!");
         return;
       }
-      speechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey.value, serviceRegion.value);
+      speechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
     }
 
     speechConfig.speechRecognitionLanguage = "en-US";
     var audioConfig  = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
     recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
 
     recognizer.startContinuousRecognitionAsync(
       function () {
@@ -84,27 +91,23 @@ document.addEventListener("DOMContentLoaded", function () {
         myJsonRequest = addSentenceToJson(e.result.text,myJsonRequest);
         console.log('recognized text', e.result.text);
     };
-  });
+}
 
+function stopSpeechToText(){
+  if(recognizer==undefined){
 
-
-  if (!!window.SpeechSDK) {
-    SpeechSDK = window.SpeechSDK;
+    phraseDiv.innerHTML += "no recognizer";
+  } else {
+    var wordCounts = sentenceToHash(myFinalText);
+    console.log(wordCounts);
+    //displays word most frequent
+    console.log(sortedWordCount(wordCounts)[0][0]);
+    postToSentiment(myJsonRequest);
     startRecognizeOnceAsyncButton.disabled = false;
-
-    document.getElementById('content').style.display = 'block';
-    document.getElementById('warning').style.display = 'none';
-
-    // in case we have a function for getting an authorization token, call it.
-    if (typeof RequestAuthorizationToken === "function") {
-        RequestAuthorizationToken();
-    }
+    phraseDiv.innerHTML += "stopped";
+    recognizer.close();
+    recognizer = undefined;
   }
-});
-
-function test(){
-  var testTxt = document.getElementById("testpara");
-  console.log(findFillerWord(sentenceToHash("Hello, so like like so so so so I am")));
 }
 
 //sends JSON to sentiment analyzer.
