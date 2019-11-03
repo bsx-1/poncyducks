@@ -6,8 +6,13 @@ var startRecognizeOnceAsyncButton;
 var subscriptionKey, serviceRegion;
 var authorizationToken;
 var SpeechSDK;
+var lastInt;
 var recognizer;
 var fillerWords = ["umm", "ummm", "um", "ah", "ahh", "ahhh", "uh", "uhh", "uhhh","so","like", "yeah",  "ok", "well", "right","see","hm","basically"];
+var questions = ["Tell me a little about yourself.","What are your biggest weaknesses?","What are your biggest strengths?","Where do you see yourself in five years?",
+"Out of all the other candidates, why should we hire you?", "Why do you want this job?","Tell me about the toughest decision you had to make in the last six months.",
+"Tell me about a time you disagreed with a decision. What did you do?","What questions do you have for me?", "If you were to rank them, what are the three traits your top performers have in common?",
+"Tell me about your work experience."]
 var myJsonRequest;
 var myFinalText;
 
@@ -21,6 +26,7 @@ function test(){
 }
 
 function init(){
+  lastInt = 0;
   phraseDiv = document.getElementById("phraseDiv");
   startRecognizeOnceAsyncButton = document.getElementById("startRecognizeOnceAsyncButton");
   subscriptionKey = "f05deb49d4f943ec8fbe53adcf5bdfd9";
@@ -38,6 +44,32 @@ function init(){
     document.getElementById('content').style.display = 'block';
     document.getElementById('warning').style.display = 'none';
   }
+}
+
+//returns overall sentiment as int
+function getOverAllSentiment(myJson){
+  console.log(myJson.length);
+  var myAverage = 0;
+  for(var index=0; index<myJson.length;index++){
+    myAverage += myJson[index].score;
+  }
+  console.log(myAverage);
+  return myAverage/myJson.length;
+}
+
+function test(){
+  getRandomPrompt();
+}
+
+function getRandomPrompt(){
+  var randomInt = Math.floor(Math.random() * questions.length);
+  while(randomInt == lastInt){
+    randomInt = Math.floor(Math.random() * questions.length);
+  }
+  lastInt = randomInt;
+  console.log(randomInt);
+  console.log(questions[randomInt]);
+  return questions[randomInt];
 }
 
 function startSpeechToText(){
@@ -119,9 +151,11 @@ function postToSentiment(myJson){
   xmlhttp.setRequestHeader("Content-Type", "application/json");
   xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            myResponse = JSON.parse(this.responseText);
+            var myResponse = JSON.parse(this.responseText);
             console.log(myResponse);
             //do stuff with response like changing the innerHTML to display the response
+            var averageSentiment = getOverAllSentiment(myResponse);
+            console.log(averageSentiment);
         }
   };
   xmlhttp.send(JSON.stringify(myJson));
