@@ -12,7 +12,7 @@ var fillerWords = ["umm", "ummm", "um", "ah", "ahh", "ahhh", "uh", "uhh", "uhhh"
 var questions = ["Tell me a little about yourself.","What are your biggest weaknesses?","What are your biggest strengths?","Where do you see yourself in five years?",
 "Out of all the other candidates, why should we hire you?", "Why do you want this job?","Tell me about the toughest decision you had to make in the last six months.",
 "Tell me about a time you disagreed with a decision. What did you do?","What questions do you have for me?", "If you were to rank them, what are the three traits your top performers have in common?",
-"Tell me about your work experience."]
+"Tell me about your work experience.", "What was your favorite school project and why?"]
 var myJsonRequest;
 var myFinalText;
 
@@ -74,6 +74,10 @@ function getRandomPrompt(){
 
 function clearLastResponse(){
   document.getElementById("wordsused").innerHTML = "";
+  document.getElementById("stopper").innerHTML = "";  
+  document.getElementById("fillTitle").innerHTML = "";
+  document.getElementById("choiceTitle").innerHTML = "";  
+  document.getElementById("fillused").innerHTML = "";  
   document.getElementById("sentiment").innerHTML = "";
   myJsonRequest = createInitialJson();
   myFinalText = "";
@@ -143,9 +147,10 @@ function stopSpeechToText(){
 
     var myFrequentWords = sortedWordCount(wordCounts);
     var myFrequentFillers = findFillerWord(wordCounts);
-    var displayWords = document.getElementById("wordsused");
+    var displayWords = document.getElementById("choiceTitle");
     displayWords.innerHTML = "";
-    displayWords.innerHTML +="Most Frequently Used Words: ";
+    displayWords.innerHTML ="Most Frequently Used Words: ";
+    displayWords = document.getElementById("wordsused");
     var maxIndex = 5;
     if(myFrequentWords.length<maxIndex){
       maxIndex = myFrequentWords.length;
@@ -158,7 +163,9 @@ function stopSpeechToText(){
     for(var i = 1; i<maxIndex; i++){
       displayWords.innerHTML +=  ", " + myFrequentWords[i][0] + ": " + myFrequentWords[i][1];
     }
-    displayWords.innerHTML += "\nMost Common Filler Words Found: ";
+    displayWords = document.getElementById("fillTitle");
+    displayWords.innerHTML = "Most Common Filler Words Found: ";
+    displayWords = document.getElementById("fillused");    
     maxIndex = 5;
     if(myFrequentFillers.length<maxIndex){
       maxIndex = myFrequentFillers.length;
@@ -173,7 +180,8 @@ function stopSpeechToText(){
     }
     postToSentiment(myJsonRequest);
     startRecognizeOnceAsyncButton.disabled = false;
-    phraseDiv.innerHTML += "\nstopped";
+    phraseDiv = document.getElementById("stopper")
+    phraseDiv.innerHTML = "Recording Complete.";
     recognizer.close();
     recognizer = undefined;
   }
