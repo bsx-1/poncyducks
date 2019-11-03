@@ -28,6 +28,7 @@ function test(){
 function init(){
   lastInt = 0;
   phraseDiv = document.getElementById("phraseDiv");
+  document.getElementById("questiontext").innerHTML = questions[0];
   startRecognizeOnceAsyncButton = document.getElementById("startRecognizeOnceAsyncButton");
   subscriptionKey = "f05deb49d4f943ec8fbe53adcf5bdfd9";
   serviceRegion = "westus";
@@ -58,7 +59,7 @@ function getOverAllSentiment(myJson){
 }
 
 function test(){
-  getRandomPrompt();
+  console.log(getRandomPrompt());
 }
 
 function getRandomPrompt(){
@@ -67,12 +68,19 @@ function getRandomPrompt(){
     randomInt = Math.floor(Math.random() * questions.length);
   }
   lastInt = randomInt;
-  console.log(randomInt);
-  console.log(questions[randomInt]);
+  document.getElementById("questiontext").innerHTML = questions[randomInt];
   return questions[randomInt];
 }
 
+function clearLastResponse(){
+  document.getElementById("wordsused").innerHTML = "";
+  document.getElementById("sentiment").innerHTML = "";
+  myJsonRequest = createInitialJson();
+  myFinalText = "";
+}
+
 function startSpeechToText(){
+    clearLastResponse();
     phraseDiv = document.getElementById("phraseDiv");
     startRecognizeOnceAsyncButton = document.getElementById("startRecognizeOnceAsyncButton");
     subscriptionKey = "f05deb49d4f943ec8fbe53adcf5bdfd9";
@@ -132,11 +140,40 @@ function stopSpeechToText(){
   } else {
     var wordCounts = sentenceToHash(myFinalText);
     console.log(wordCounts);
-    //displays word most frequent
-    console.log(sortedWordCount(wordCounts)[0][0]);
+
+    var myFrequentWords = sortedWordCount(wordCounts);
+    var myFrequentFillers = findFillerWord(wordCounts);
+    var displayWords = document.getElementById("wordsused");
+    displayWords.innerHTML = "";
+    displayWords.innerHTML +="Most Frequently Used Words: ";
+    var maxIndex = 5;
+    if(myFrequentWords.length<maxIndex){
+      maxIndex = myFrequentWords.length;
+    }
+    if(myFrequentWords.length>0){
+      displayWords.innerHTML += myFrequentWords[0][0] + ": " + myFrequentWords[0][1];
+    } else {
+      displayWords.innerHTML += "No Content";
+    }
+    for(var i = 1; i<maxIndex; i++){
+      displayWords.innerHTML +=  ", " + myFrequentWords[i][0] + ": " + myFrequentWords[i][1];
+    }
+    displayWords.innerHTML += "\nMost Common Filler Words Found: ";
+    maxIndex = 5;
+    if(myFrequentFillers.length<maxIndex){
+      maxIndex = myFrequentFillers.length;
+    }
+    if(myFrequentFillers.length>0){
+      displayWords.innerHTML += myFrequentFillers[0][0] + ": " + myFrequentFillers[0][1];
+    } else {
+      displayWords.innerHTML += "No Filler Words Found"
+    }
+    for(var i = 1; i<maxIndex; i++){
+      displayWords.innerHTML += ", " + myFrequentFillers[i][0] + ": " + myFrequentFillers[i][1];
+    }
     postToSentiment(myJsonRequest);
     startRecognizeOnceAsyncButton.disabled = false;
-    phraseDiv.innerHTML += "stopped";
+    phraseDiv.innerHTML += "\nstopped";
     recognizer.close();
     recognizer = undefined;
   }
@@ -155,6 +192,14 @@ function postToSentiment(myJson){
             console.log(myResponse);
             //do stuff with response like changing the innerHTML to display the response
             var averageSentiment = getOverAllSentiment(myResponse);
+            var roundedAvg = Math.round(averageSentiment * 100);
+            if(averageSentiment!=undefined){
+              if(roundedAvg>50){
+                document.getElementById("sentiment").innerHTML = roundedAvg + "%" + " positive based on response given";
+              } else {
+                document.getElementById("sentiment").innerHTML = roundedAvg + "%" + " negative based on response given";
+              }
+            }
             console.log(averageSentiment);
         }
   };
@@ -222,6 +267,9 @@ function wordArrayToHash(myWordArray){
   for(var i=0;i<myWordArray.length;i++){
     if((myWordArray[i]==undefined) || (myWordArray[i]=="")) continue;
     var lowerCaseWord = myWordArray[i].toLowerCase();
+    if(lowerCaseWord == "i"){
+      lowerCaseWord = "I";
+    }
     if(object[lowerCaseWord]==undefined){
       object[lowerCaseWord] = 1;
     } else {
