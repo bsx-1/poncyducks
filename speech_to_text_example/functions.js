@@ -7,6 +7,7 @@ var subscriptionKey, serviceRegion;
 var authorizationToken;
 var SpeechSDK;
 var recognizer;
+var fillerWords = ["umm", "ummm", "um", "ah", "ahh", "ahhh", "uh", "uhh", "uhhh","so","like", "yeah",  "ok", "well", "right","see","hm","basically"];
 
 document.addEventListener("DOMContentLoaded", function () {
   startRecognizeOnceAsyncButton = document.getElementById("startRecognizeOnceAsyncButton");
@@ -103,13 +104,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function test(){
   var testTxt = document.getElementById("testpara");
-  var testingJson = createInitialJson();
-  testingJson = addSentenceToJson("I am having a great time.",testingJson);
-  testingJson = addSentenceToJson("I am having a horrible time.", testingJson);
-  postToSentiment(testingJson);
+  console.log(findFillerWord(sentenceToHash("Hello, so like like so so so so I am")));
 }
 
-//sends JSON to sentiment analyzer. JSON can be created with createInitialJson and addSentenceToJson
+//sends JSON to sentiment analyzer.
+//pass in JSON created with createInitialJson and addSentenceToJson
 function postToSentiment(myJson){
   var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
   var theUrl = "https://cors-anywhere.herokuapp.com/"+"https://poncyduckstextanalyzer.azurewebsites.net/api/HttpTrigger?code=ITA5bKwNaUKggjsmeaoCNzxsCr11tahKUmx9afV/XDNsCj/tIERNWQ==";
@@ -118,14 +117,30 @@ function postToSentiment(myJson){
   xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             myResponse = JSON.parse(this.responseText);
-            console.log(myResponse)
+            console.log(myResponse);
+            //do stuff with response like changing the innerHTML to display the response
         }
   };
   xmlhttp.send(JSON.stringify(myJson));
-  //xmlhttp.send(JSON.stringify({"data":{"documents":[{"language":"en", "id":"1", "text":"I had the best day of my life."}]}}));
 }
 
-//sorts unsorted object based on word count
+//returns an array of filler words used in speech with word count. Filler words are defined at the top in an array.
+//pass in result from sentenceToHash to use this function
+function findFillerWord(unsortedObject){
+  var returnArray = [];
+  for(var i=0; i<fillerWords.length;i++){
+    if(unsortedObject[fillerWords[i]]!=undefined){
+      returnArray.push([fillerWords[i],unsortedObject[fillerWords[i]]]);
+    }
+  }
+  returnArray.sort(function(a,b){
+    return b[1]-a[1];
+  })
+  return returnArray;
+}
+
+//sorts unsorted object based on word count and returns array
+//pass in result from sentenceToHash to use this function
 function sortedWordCount(unsortedObject){
   var sortable = [];
   for (var word in unsortedObject){
@@ -137,15 +152,14 @@ function sortedWordCount(unsortedObject){
   return sortable;
 }
 
-//returns a JSON with empty documents data
-//call this and pass returned JSON into addSentenceToJson
+//returns a JSON with initialized empty documents data
 function createInitialJson(){
   var myText = '{"data":{"documents":[]}}';
   return JSON.parse(myText);
 }
 
 //returns a JSON with a sentence added to documents data in the given JSON
-//given JSON should be initially created by createInitialJson
+//pass in result from createInitialJson to use this function
 function addSentenceToJson(singleSentence, givenJson){
   var myId = givenJson.data.documents.length + 1;
   myId = myId.toString(10);
@@ -165,6 +179,7 @@ function sentenceToWordArray(mySentence){
 }
 
 //returns an object with words mapped to count of word number when array of words passed in.
+//pass in result from sentenceToWordArray to use this function
 function wordArrayToHash(myWordArray){
   let object = {};
   for(var i=0;i<myWordArray.length;i++){
