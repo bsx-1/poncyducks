@@ -41,3 +41,7 @@ npm build
 ```
 
 Visit the Express app at 'http://localhost:3001' and you will see your app served from the 'build' folder
+poncyducks.tech
+:)
+
+"At least when you work with hardware, it blows up." -Arthur Wojtyna
