@@ -1,4 +1,3 @@
-/*
 const CognitiveServicesCredentials = require("@azure/ms-rest-js");
 const TextAnalyticsAPIClient = require("@azure/cognitiveservices-textanalytics");
 
@@ -16,7 +15,7 @@ const endpoint = process.env[endpoint_var];
 
 const creds = new CognitiveServicesCredentials.ApiKeyCredentials({ inHeader: { 'Ocp-Apim-Subscription-Key': subscription_key } });
 const client = new TextAnalyticsAPIClient.TextAnalyticsClient(creds, endpoint);
-
+/*
 // 0 is negative, 1 is positive
 
 const inputDocuments = {documents:[
@@ -34,19 +33,28 @@ operation
 
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
+    console.log(req);
+    var inputDocuments = req.data;
+    var status;
+    var body;
 
-    
-
-    if (req.query.name || (req.body && req.body.name)) {
-        context.res = {
-            // status: 200, /* Defaults to 200 */
-            body: "Hello " + (req.query.name || req.body.name)
-        };
+    if (inputDocuments) {
+        status = 200;
+        client.sentiment({multiLanguageBatchInput: inputDocuments})
+        .then(result => {
+             console.log(result.documents);
+             body = result.documents;
+        })
+        .catch(err => {
+            throw err;
+        });
     }
     else {
-        context.res = {
-            status: 400,
-            body: "Please pass a name on the query string or in the request body"
-        };
+        status = 400;
+        body = 'Please pass data in the form {documents:[{language:""en"", id:""1"", text:""I had the best day of my life.""}]}';
+    }
+    context.res = {
+        status: status,
+        body: body
     }
 };
