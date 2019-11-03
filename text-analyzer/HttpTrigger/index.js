@@ -1,3 +1,4 @@
+/*
 const CognitiveServicesCredentials = require("@azure/ms-rest-js");
 const TextAnalyticsAPIClient = require("@azure/cognitiveservices-textanalytics");
 
@@ -29,23 +30,23 @@ operation
 })
 .catch(err => {
     throw err;
-});
-
-// can use entity recognition for resume comparison!
-/*
-let inputLanguage = {
-    documents: [
-        {language:"en", id:"1", text:"My cat might need to see a veterinarian."}
-    ]
-};
-
-let operation = client.keyPhrases({
-    multiLanguageBatchInput: inputLanguage
-    });
-    operation
-    .then(result => {
-        console.log(result.documents);
-    })
-    .catch(err => {
-        throw err;
 });*/
+
+module.exports = async function (context, req) {
+    context.log('JavaScript HTTP trigger function processed a request.');
+
+    
+
+    if (req.query.name || (req.body && req.body.name)) {
+        context.res = {
+            // status: 200, /* Defaults to 200 */
+            body: "Hello " + (req.query.name || req.body.name)
+        };
+    }
+    else {
+        context.res = {
+            status: 400,
+            body: "Please pass a name on the query string or in the request body"
+        };
+    }
+};
