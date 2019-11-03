@@ -11,6 +11,15 @@ var fillerWords = ["umm", "ummm", "um", "ah", "ahh", "ahhh", "uh", "uhh", "uhhh"
 var myJsonRequest;
 var myFinalText;
 
+document.addEventListener("DOMContentLoaded", function () {
+  init();
+});
+
+function test(){
+  var testTxt = document.getElementById("testpara");
+  console.log(findFillerWord(sentenceToHash("Hello, so like like so so so so I am")));
+}
+
 function init(){
   phraseDiv = document.getElementById("phraseDiv");
   startRecognizeOnceAsyncButton = document.getElementById("startRecognizeOnceAsyncButton");
@@ -28,11 +37,6 @@ function init(){
 
     document.getElementById('content').style.display = 'block';
     document.getElementById('warning').style.display = 'none';
-
-    // in case we have a function for getting an authorization token, call it.
-    if (typeof RequestAuthorizationToken === "function") {
-        RequestAuthorizationToken();
-    }
   }
 }
 
