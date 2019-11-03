@@ -11,52 +11,65 @@
    <script src="functions.js"></script>
 <style>
 body {
-  background-color: #49686F;
+  background-color: #2F2FA2;
 }
 </style>  
 </head>
 <body>
- <!-- UI code goes here -->
+  <nav class="navbar navbar-light bg-light">
+      <a class="navbar-brand" href="#">
+          <img src="duckview.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
+          DuckView
+      </a>
+  </nav>
 <div id="warning">
   <h1 style="font-weight:500;">Speech Recognition Speech SDK not found (microsoft.cognitiveservices.speech.sdk.bundle.js missing).</h1>
 </div>
 
-<div id="content" style="display:none">
+<br>
+<br>
+
+<div id="content" style="display:none" align= center>
   <table width="100%">
     <tr>
-      <td></td>
-      <td><h1 style="font-weight:500;">DuckView</h1></td>
+      <div class="card" style="width: 44rem;">
+          <div class="card-body">
+            <h5 class="card-title">Click to Start.</h5>
+            <p class="card-text" id='questiontext'>Replace me with a random interview question!</p>
+            <button onclick="getRandomPrompt()" id="promptButton" class="btn-dark">Get a Random Interview Prompt</button>
+          </div>
+        </div>
     </tr>
+    <br>
     <tr>
-      <td></td>
-      <td><button onclick="getRandomPrompt()" id="promptButton" class="btn-dark">Get a Random Interview Prompt</button></td>
+      <div class="card" style="width: 44rem;">
+          <div class="card-body">
+            <h5 class="card-title">Answer the interview question. Your words will show below.</h5>
+            <p class="card-text" id='phraseDiv'>Your words will go here!</p>
+            <button onclick="startSpeechToText()" id="startRecognizeOnceAsyncButton" class="btn-dark">Start</button>
+            <button onclick="stopSpeechToText()" type="button" id="stopRecognition" class="btn-dark">Stop</button>
+          </div>
+        </div>
     </tr>
+    <br>    
     <tr>
-      <td></td>
-      <td><textarea style="display: inline-block;width:500px;height:50px"></textarea></td>
-    </tr>
+        <div class="card" style="width: 44rem;">
+            <div class="card-body">
+              <h5 class="card-title">Word Choice Analysis. Frequently used words and fillers shown below.</h5>
+              <p class="card-text" id='wordsused'></p>
+            </div>
+          </div>
+      </tr>    
     <tr>
-      <td></td>
-      <td><button onclick="startSpeechToText()" id="startRecognizeOnceAsyncButton" class="btn-dark">Start recognition</button></td>
-    </tr>
+    <br>      
     <tr>
-      <td align="right" valign="top">Results</td>
-      <td><textarea id="phraseDiv" style="display: inline-block;width:500px;height:200px"></textarea></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <button onclick="stopSpeechToText()" type="button" id="stopRecognition" class="btn-dark">Stop</button>
-      </td>
-    </tr>
-    <tr>
-        <td align="right" valign="top">Word Choice Analysis</td>
-        <td><textarea id="phraseDiv" style="display: inline-block;width:500px;height:200px"></textarea></td>
-    </tr>
-    <tr>
-      <td align="right" valign="top">Mood Analysis</td>
-      <td><textarea id="phraseDiv" style="display: inline-block;width:500px;height:200px"></textarea></td>
-    </tr>
+        <div class="card" style="width: 44rem;">
+            <div class="card-body">
+              <h5 class="card-title">Mood Analysis. Below will show your overall mood based on the response.</h5>
+              <p class="card-text" id='sentiment'></p>
+            </div>
+          </div>
+      </tr>    
   </table>
 </div>
 
